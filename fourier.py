@@ -1,11 +1,15 @@
+from typing import Union
+
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from scipy.fft import rfft, rfftfreq, irfft
 
 from config import eeg_sample_rate, eeg_time
 
 
-def fourier_transform_eeg(eeg_data, sample_rate=eeg_sample_rate, duration=eeg_time):
+def fourier_transform_eeg(eeg_data: np.array, sample_rate: int = eeg_sample_rate, duration: int = eeg_time) -> np.ndarray:
     """
     :param eeg_data: 1D np.array
     :param sample_rate: int
@@ -24,12 +28,12 @@ def fourier_transform_eeg(eeg_data, sample_rate=eeg_sample_rate, duration=eeg_ti
     """
 
     # Creating a list to store the filtered signals
-    filtered_signals = [[], []]
+    filtered_signals: Union[list, np.ndarray] = [[], []]
 
     for i in range(eeg_data.shape[0]):
         # Getting the amplitude and frequency of the signal
-        amplitude = rfft(eeg_data[i])
-        frequency = rfftfreq(sample_rate * duration, 1 / sample_rate)
+        amplitude: np.ndarray = rfft(eeg_data[i])
+        frequency: np.ndarray = rfftfreq(sample_rate * duration, 1 / sample_rate)
 
         filtered_signals[0].append(amplitude)
         filtered_signals[1].append(frequency)
@@ -38,13 +42,18 @@ def fourier_transform_eeg(eeg_data, sample_rate=eeg_sample_rate, duration=eeg_ti
     return filtered_signals
 
 
-def visualize_inverse_fourier(transformed_eeg_data):
+def visualize_inverse_fourier(transformed_eeg_data: np.ndarray):
     """
     :param transformed_eeg_data: 1D np.array
     :return: None
 
     Function to visualize a Fourier Transformed EEG
     """
+    axis: Axes
+    figure: Figure
+    amplitude: int
+    frequency: int
+
     nx = 5
     ny = 4
 
@@ -55,9 +64,7 @@ def visualize_inverse_fourier(transformed_eeg_data):
     for i in range(transformed_eeg_data.shape[1]):
         # Reconstructing the filtered signal using the inverse Fourier transform
         amplitude, frequency = transformed_eeg_data[:, i]
-        reconstructed_signal = irfft(amplitude)
-        axis[i // ny, i % ny].plot(reconstructed_signal,
-                                   label="Reconstructed Signal",
-                                   color="blue")
+        reconstructed_signal: np.ndarray = irfft(amplitude)
+        axis[i // ny, i % ny].plot(reconstructed_signal, label="Reconstructed Signal", color="blue")
 
     plt.show()

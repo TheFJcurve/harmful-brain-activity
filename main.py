@@ -52,7 +52,7 @@ def setup_model(x_train_list, y_train_list):
     tensorboard_cb = keras.callbacks.TensorBoard(run_logdir)
 
     # Model Architecture:
-    model = keras.models.Sequential([
+    novice_model = keras.models.Sequential([
         keras.layers.Flatten(),
         keras.layers.Dense(units=64, activation='relu'),
         keras.layers.Dense(units=128, activation='relu'),
@@ -62,11 +62,11 @@ def setup_model(x_train_list, y_train_list):
     ])
 
     # Model Compilation
-    model.compile(
+    novice_model.compile(
         optimizer="rmsprop",
         loss="mse",
         loss_weights=None,
-        metrics=[keras.metrics.BinaryAccuracy()],
+        metrics=['acc'],
         weighted_metrics=None,
         run_eagerly=False,
         steps_per_execution=1,
@@ -75,16 +75,16 @@ def setup_model(x_train_list, y_train_list):
     )
 
     # Model Training
-    history = model.fit(x_train_list,
-                        y_train_list,
-                        epochs=100,
-                        batch_size=32,
-                        callbacks=[tensorboard_cb, early_stopping_cb, reduce_on_plateau])
+    history = novice_model.fit(x_train_list,
+                               y_train_list,
+                               epochs=100,
+                               batch_size=32,
+                               callbacks=[tensorboard_cb, early_stopping_cb, reduce_on_plateau])
 
-    return model
+    return history, novice_model
 
 
-def get_prediction(model):
+def get_prediction(trained_model):
     test = pd.read_csv(TEST_CSV)
 
     test_eeg_id = test['eeg_id'][0]
@@ -99,7 +99,7 @@ def get_prediction(model):
     print("Shape of the fourier transformed signal: ", transformed_test_eeg.shape)
     print("Data points for an entire EEG signal: ", transformed_test_eeg.size)
 
-    answer = model.predict(np.array([transformed_test_eeg]))
+    answer = trained_model.predict(np.array([transformed_test_eeg]))
     total_answer = np.sum(answer)
 
     print("Output Probability: ", answer / total_answer)
@@ -108,5 +108,5 @@ def get_prediction(model):
 if __name__ == "__main__":
     setup_data()
     X_train_list, Y_train_list = get_input_data(BATCH_SIZE)
-    model = setup_model(X_train_list, Y_train_list)
+    model_history, model = setup_model(X_train_list, Y_train_list)
     get_prediction(model)

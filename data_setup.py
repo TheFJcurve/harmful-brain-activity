@@ -45,11 +45,11 @@ def get_input_data(length=1000):
         # Reading the eeg and spectrogram data with the aforementioned ids
         eeg = pd.read_parquet(TRAIN_EEGS + f'{eeg_id}.parquet')
 
-        # Takes the 50 second sample of the eeg data
-        eeg = eeg.loc[eeg_label_offset_seconds : eeg_label_offset_seconds + eeg_duration - 1,]
+        # Takes the 50-second sample of the eeg data
+        eeg = eeg.loc[eeg_label_offset_seconds: eeg_label_offset_seconds + eeg_duration - 1, ]
         eeg = eeg.to_numpy().T
         # Each row represents a time point with all the node.
-        # Each column represents a node at all time points one by one.
+        # Each column represents a node at all-time points one by one.
 
         # Votes for each class
         seizure_vote = train_data['seizure_vote'][i]
@@ -60,15 +60,10 @@ def get_input_data(length=1000):
         other_vote = train_data['other_vote'][i]
 
         # Defining the new X_train and Y_train
-        y_train = np.array([seizure_vote,
-                            lpd_vote,
-                            gpd_vote,
-                            lrda_vote,
-                            grda_vote,
-                            other_vote])
+        y_train = np.array([seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote])
         x_train = fourier_transform_eeg(eeg)
+
         np.append(list_of_x_train, x_train)
         np.append(list_of_y_train, y_train)
 
     return list_of_x_train, list_of_y_train
-

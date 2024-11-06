@@ -16,7 +16,6 @@ fi
 pip -q install -r requirements.txt
 chmod 600 ~/.kaggle/kaggle.json
 kaggle competitions download -c hms-harmful-brain-activity-classification
-unzip -q hms-harmful-brain-activity-classification.zip -d data
 
 if [ $# -eq 1 ] && [ "$1" == "-r" ]; then
     rm hms-harmful-brain-activity-classification.zip
